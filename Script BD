@@ -1,0 +1,58 @@
+CREATE TABLE academia (
+    id_academia SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cnpj CHAR(14) UNIQUE NOT NULL,
+    localizacao VARCHAR(80) NOT NULL,
+    telefone VARCHAR(20)
+);
+CREATE TABLE usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cpf CHAR(11) UNIQUE NOT NULL,
+    email VARCHAR(120) UNIQUE NOT NULL,
+    data_nascimento DATE,
+    tipo_usuario VARCHAR(15) NOT NULL CHECK (tipo_usuario IN ('cliente', 'funcionario'))
+);
+CREATE TABLE acadUser(
+	id_academia INT NOT NULL,
+	id_user INT NOT NULL,
+
+	PRIMARY KEY (id_academia, id_user),
+	CONSTRAINT FK_acad FOREIGN KEY (id_academia) REFERENCES academia (id_academia)
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	CONSTRAINT FK_USER FOREIGN KEY (id_user) REFERENCES usuario (id_usuario)
+		ON DELETE CASCADE ON UPDATE CASCADE
+	
+);
+CREATE TABLE cliente (
+    id_usuario INT PRIMARY KEY,
+    plano VARCHAR(50),
+    data_inicio DATE,
+    data_vencimento DATE,
+    status BOOLEAN DEFAULT TRUE,
+    senha VARCHAR(80) NOT NULL
+
+    FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE funcionario (
+    id_usuario INT PRIMARY KEY,
+    cargo VARCHAR(50),
+    salario NUMERIC(10,2),
+    data_admissao DATE DEFAULT CURRENT_DATE,
+    senha VARCHAR(80) NOT NULL
+    
+    FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE TABLE treino (
+    id_treino SERIAL PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    tipo_treino VARCHAR(50) NOT NULL,
+    pdf_treino TEXT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    observacoes TEXT,
+
+    FOREIGN KEY (id_usuario) REFERENCES usuario (id_usuario)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
