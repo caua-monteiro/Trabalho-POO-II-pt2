@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.appacademia.controller.IncluirUsuarioController"
+      spacing="10" alignment="CENTER"
+      style="-fx-padding: 20; -fx-background-color: #f8f8f8;">
+
+    <Label text="Selecione o tipo de usuario"
+           style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+    <GridPane>
+        <Label text="Tipo De usuario:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbTipoUsuario" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Selecionar" onAction="#DirecionamentoCadastro"
+            style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+        <Button text="Cancelar" onAction="#fecharJanela"
+                style="-fx-background-color: #f44336; -fx-text-fill: white;"/>
+    </HBox>
+
+</VBox>

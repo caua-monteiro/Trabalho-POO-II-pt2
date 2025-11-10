@@ -1,0 +1,168 @@
+package com.appacademia.dao;
+
+import com.appacademia.Database;
+import com.appacademia.model.Usuario;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UsuarioDAO {
+
+    public UsuarioDAO() {
+        try {
+            criarUsuariosDeTeste(); // 🔹 cria automaticamente admin/aluno se não existirem
+        } catch (SQLException e) {
+            System.err.println("⚠️ Erro ao criar usuários de teste: " + e.getMessage());
+        }
+    }
+
+    // 🔹 Cria admin e aluno de teste se o banco estiver vazio
+    private void criarUsuariosDeTeste() throws SQLException {
+        try (Connection c = Database.getConnection()) {
+            // Verifica se já existem usuários
+            try (PreparedStatement ps = c.prepareStatement("SELECT COUNT(*) FROM usuario");
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return; // já existem, não cria
+                }
+            }
+
+            // Cria administrador
+            int idAdmin = 0;
+            try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO usuario (nome, cpf, email, tipo_usuario)
+                VALUES ('Administrador Teste', '00000000000', 'admin@app.com', 'funcionario')
+                RETURNING id_usuario
+            """)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) idAdmin = rs.getInt("id_usuario");
+                }
+            }
+            try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO funcionario (id_usuario, cargo, salario, senha)
+                VALUES (?, 'Gerente', 5000, 'admin123')
+            """)) {
+                ps.setInt(1, idAdmin);
+                ps.executeUpdate();
+            }
+
+            // Cria aluno
+            int idAluno = 0;
+            try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO usuario (nome, cpf, email, tipo_usuario)
+                VALUES ('Aluno Teste', '11111111111', 'aluno@app.com', 'cliente')
+                RETURNING id_usuario
+            """)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) idAluno = rs.getInt("id_usuario");
+                }
+            }
+            try (PreparedStatement ps = c.prepareStatement("""
+                INSERT INTO cliente (id_usuario, senha, plano, data_inicio, data_vencimento, status)
+                VALUES (?, 'aluno123', 'Mensal', CURRENT_DATE, CURRENT_DATE + INTERVAL '30 days', TRUE)
+            """)) {
+                ps.setInt(1, idAluno);
+                ps.executeUpdate();
+            }
+
+            System.out.println("✅ Usuários de teste criados com sucesso!");
+            System.out.println("   • Admin -> ID: " + idAdmin + " | Senha: admin123");
+            System.out.println("   • Aluno -> ID: " + idAluno + " | Senha: aluno123");
+        }
+    }
+
+    // 🔹 Login por ID (para a tela de login)
+    public Usuario autenticarPorId(int idUsuario, String senha) throws SQLException {
+        String sql = """
+        SELECT u.id_usuario, u.nome, u.tipo_usuario, c.senha AS senha_cliente, f.senha AS senha_funcionario
+        FROM usuario u
+        LEFT JOIN cliente c ON u.id_usuario = c.id_usuario
+        LEFT JOIN funcionario f ON u.id_usuario = f.id_usuario
+        WHERE u.id_usuario = ?
+    """;
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idUsuario);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String senhaCliente = rs.getString("senha_cliente");
+                    String senhaFuncionario = rs.getString("senha_funcionario");
+
+                    boolean senhaCorreta =
+                            (senhaCliente != null && senhaCliente.equals(senha)) ||
+                                    (senhaFuncionario != null && senhaFuncionario.equals(senha));
+
+                    if (senhaCorreta) {
+                        Usuario u = new Usuario();
+                        u.setId(rs.getInt("id_usuario"));
+                        u.setNome(rs.getString("nome"));
+                        u.setTipoUsuario(rs.getString("tipo_usuario"));
+                        return u;
+                    }
+                }
+            }
+        }
+
+        return null; // login falhou
+    }
+
+
+
+    // 🔹 Retorna todos os usuários cadastrados
+    public List<Usuario> findAll() throws SQLException {
+        List<Usuario> list = new ArrayList<>();
+        String sql = "SELECT id_usuario, nome, cpf, email, data_nascimento, tipo_usuario FROM usuario ORDER BY nome";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Usuario u = mapUsuario(rs);
+                list.add(u);
+            }
+        }
+        return list;
+    }
+
+    public List<Usuario> findByNome(String nome) throws SQLException{
+        List<Usuario> list = new ArrayList<>();
+        String sql = """
+                SELECT id_usuario, nome, cpf, email, data_nascimento, tipo_usuario
+                FROM usuario 
+                WHERE nome ~* ?""";
+        try(Connection c = Database.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, ".*" + nome + ".*" );
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()){
+                Usuario u = mapUsuario(rs);
+                list.add(u);
+            }
+        }
+        return list;
+    }
+
+    private Usuario mapUsuario(ResultSet rs) throws SQLException {
+        Usuario u = new Usuario();
+        u.setId(rs.getInt("id_usuario"));
+        u.setNome(rs.getString("nome"));
+        u.setCpf(rs.getString("cpf"));
+        u.setEmail(rs.getString("email"));
+        Date d = rs.getDate("data_nascimento");
+        if (d != null) u.setDataNascimento(d.toLocalDate());
+        u.setTipoUsuario(rs.getString("tipo_usuario"));
+        return u;
+    }
+
+    public boolean deleteById(int id) throws SQLException {
+        String sql = "DELETE FROM usuario WHERE id_usuario = ?";
+        try (Connection c = Database.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
+}
