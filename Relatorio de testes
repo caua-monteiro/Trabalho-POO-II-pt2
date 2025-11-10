@@ -1,0 +1,58 @@
+Classe academiaTest:
+  void setUp():
+  Metodo usado para criar uma academia para os testes utilizados
+  
+  void deveCriarAcademiaComCamposCorretos()
+  Metodo para verificar se todos os campos foram devidamente criados e verificar se os valores estão corretos
+
+  void telefoneDeveEstarFormatado()
+  Metodo para verificar a formatação do numero de telefone utilizado
+
+  void localizacaoNaoDeveSerVazia()
+  Metodo que verifica se a localização da academia está vazia
+
+  void podeAtualizarNome()
+  Metodo que testa a capacidade de alteração real do nome da academia
+
+Classe TreinoTest:
+  void setUp()
+    Mesmo objetivo da classe anterior
+
+  void deveCriarTreinoComCamposPreenchidos()
+    Testa o preenchimento correto de todos os campos do treino
+
+  void pdfDoTreinoDeveSerUrlNaoNula()
+    Teste que verifica se o compo PDF traz uma url para visualização do pdf no navegador
+  
+  void dataCriacaoDeveSerAnteriorAoAgora()
+    Garante que a data de criação é valida por meio de comparação com a data atual
+
+  void observacoesPodeSerAlterada() 
+    Verifica se as observações dos treinos podem ser mudadas
+
+Classe usuario:
+  void setUp()
+    Compartilha objetivo com os outros metodos SetUp
+  void deveCriarUsuarioComDadosCorretos() {
+    Verifica a criação e preenchimento dos campos do usuario
+    
+  void devePermitirAtualizarEmail() 
+    Garante que o Email pode ser alterado de maneira valida
+    
+  void deveConterDataNascimentoValida()
+    Varifica se a data de nascimento é valida
+    
+  void tipoUsuarioNaoDeveSerNulo() 
+    Testa o tipo do usuario para garantir que não é nulo
+
+Classe LeitorPDF:
+    void LerApiCloudName()
+      Testa a captura do nome da nuvem do arquivo config.properties
+    void LerApiKey() 
+      Garante que o programa esta lendo uma chave para a API
+    
+    void LerApiSecret() 
+      Garante que a aplicação le o API secret
+    
+    void propriedadeInexistenteRetornaNull()
+      Testa para casos onde propriedades inexistentes são "acessadas"
