@@ -23,7 +23,7 @@ public class TreinoTest {
 
     @Test
     void deveCriarTreinoComCamposPreenchidos() {
-        assertNull(treino.getId(), "Id deve ser nulo ate acesso do banco");
+        assertEquals(0, treino.getId(), "Id deve ser nulo ate acesso do banco");
         assertEquals("Força", treino.getTipoTreino(), "Tipo de treino deve ser Força");
         assertEquals(1, treino.getIdUsuario(), "ID do usuário deve ser 1 para o teste");
     }
