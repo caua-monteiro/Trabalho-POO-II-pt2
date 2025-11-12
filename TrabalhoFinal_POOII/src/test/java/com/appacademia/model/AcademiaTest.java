@@ -21,7 +21,7 @@ public class AcademiaTest {
     @Test
     void deveCriarAcademiaComCamposCorretos() {
         assertEquals(0, academia.getId(), "Id deve ser nulo ate acesso ao banco");
-        assertEquals("First Gym", academia.getNome(), "Nome deve ser FitGym");
+        assertEquals("First Gym", academia.getNome(), "Nome deve ser First Gym");
         assertEquals("12345678000199", academia.getCnpj(), "CNPJ deve coincidir");
     }
 
