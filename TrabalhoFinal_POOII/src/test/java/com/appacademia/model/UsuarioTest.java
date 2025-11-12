@@ -22,7 +22,7 @@ public class UsuarioTest {
 
     @Test
     void deveCriarUsuarioComDadosCorretos() {
-        assertNull(usuario.getId(), "Id deve ser nulo pre Acesso ao banco");
+        assertEquals(0, usuario.getId(), "Id deve ser nulo pre Acesso ao banco");
         assertEquals("Carlos", usuario.getNome(), "Nome deve ser Carlos");
         assertEquals("12345678900", usuario.getCpf(), "CPF deve ser 12345678900");
     }
